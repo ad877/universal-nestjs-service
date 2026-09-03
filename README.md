@@ -61,6 +61,45 @@ Event:
 POST /api/event
 ```
 
+Decode VIN:
+
+```text
+POST /api/vehicles/decode-vin
+```
+
+Example body:
+
+```json
+{
+  "vin": "1HGCM82633A004352"
+}
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "vin": "1HGCM82633A004352",
+  "manufacturer": "Honda",
+  "country": "USA",
+  "modelYear": 2033,
+  "engine": "2.0L I4",
+  "timestamp": "2026-09-03T12:00:00.000Z"
+}
+```
+
+An invalid VIN (wrong length, invalid characters, or a failing ISO 3779 check digit)
+responds with `400 Bad Request`:
+
+```json
+{
+  "success": false,
+  "error": "INVALID_VIN",
+  "reason": "VIN check digit mismatch: expected '3', got '9'"
+}
+```
+
 ## TCP
 
 The TCP microservice supports these patterns:
@@ -69,6 +108,7 @@ The TCP microservice supports these patterns:
 ping
 echo
 event
+decode-vin
 ```
 
 Example client from another NestJS repository:
@@ -128,6 +168,40 @@ Response:
 }
 ```
 
+Decode VIN:
+
+```typescript
+const response = await client
+  .send('decode-vin', { vin: '1HGCM82633A004352' })
+  .toPromise();
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "pattern": "decode-vin",
+  "vin": "1HGCM82633A004352",
+  "manufacturer": "Honda",
+  "country": "USA",
+  "modelYear": 2033,
+  "engine": "2.0L I4",
+  "timestamp": "2026-09-03T12:00:00.000Z"
+}
+```
+
+An invalid VIN returns an error shape instead of throwing:
+
+```json
+{
+  "success": false,
+  "pattern": "decode-vin",
+  "error": "INVALID_VIN",
+  "reason": "VIN check digit mismatch: expected '3', got '9'"
+}
+```
+
 ## Build
 
 ```bash
@@ -144,7 +218,12 @@ universal-nestjs-microservice/
 │   ├── app.module.ts
 │   ├── app.controller.ts
 │   ├── app.service.ts
-│   └── microservice.controller.ts
+│   ├── microservice.controller.ts
+│   └── vehicles/
+│       ├── vehicles.controller.ts
+│       ├── vin-decoder.service.ts
+│       └── dto/
+│           └── decode-vin.dto.ts
 ├── .env.example
 ├── .gitignore
 ├── nest-cli.json
