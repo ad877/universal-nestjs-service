@@ -3,6 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MicroserviceController } from './microservice.controller';
+import { VehiclesController } from './vehicles/vehicles.controller';
+import { VinDecoderService } from './vehicles/vin-decoder.service';
 
 @Module({
   imports: [
@@ -10,7 +12,7 @@ import { MicroserviceController } from './microservice.controller';
       isGlobal: true,
     }),
   ],
-  controllers: [AppController, MicroserviceController],
-  providers: [AppService],
+  controllers: [AppController, MicroserviceController, VehiclesController],
+  providers: [AppService, VinDecoderService],
 })
 export class AppModule {}
